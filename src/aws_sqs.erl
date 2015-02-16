@@ -57,7 +57,7 @@ create_queue_request(QueueName, Params, Response) ->
     RequestParams = Params ++
         [{"QueueName", QueueName},
          {"Action", "CreateQueue"}],
-    request(post, AWS_SQS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SQS_URL'), RequestParams, Response).
 
 create_queue_response(_Headers, _RequestId, Doc) ->
     QueueUrl = aws_xpath:value("//QueueUrl", Doc),
@@ -99,7 +99,7 @@ list_queues_detail(QueueNamePrefix) ->
 list_queues_request(Params, Response) ->
     RequestParams = Params ++
         [{"Action", "ListQueues"}],
-    request(post, AWS_SQS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SQS_URL'), RequestParams, Response).
 
 list_queues_response(_Headers, _RequestId, Doc) ->
     QueueUrls = aws_xpath:values("//QueueUrl", Doc),
