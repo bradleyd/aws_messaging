@@ -21,7 +21,7 @@
 %%%%  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 %%%%  OTHER DEALINGS IN THE SOFTWARE.
 
--module(aws_sqs, [AWS_SQS_URL, AWS_ACCESS_KEY, AWS_SECRET_KEY]).
+-module(aws_sqs).
 
 -export([create_queue/1, create_queue_detail/1, create_queue/2, create_queue_detail/2, create_queue_request/3,
          delete_queue/1, delete_queue_detail/1, delete_queue_request/3,
@@ -35,7 +35,7 @@
          add_permission/4, add_permission_detail/4, add_permission_request/4,
          remove_permission/2, remove_permission_detail/2, remove_permission_request/4]).
 
--define(AWS_QUERY, (aws_query:new(AWS_ACCESS_KEY, AWS_SECRET_KEY))).
+-define(AWS_QUERY, (aws_query:new(os:getenv('AWS_ACCESS_KEY'), os:getenv('AWS_SECRET_KEY')))).
 
 %% Create Queue
 
