@@ -21,14 +21,14 @@
 %%%%  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 %%%%  OTHER DEALINGS IN THE SOFTWARE.
 
--module(aws_query, [AWS_ACCESS_KEY, AWS_SECRET_KEY]).
+-module(aws_query).
 
 -export([request/4]).
 
 request(Method, Url, Params, ResponseFun) ->
     Timestamp = timestamp(),
     SignParams = Params ++ 
-        [{"AWSAccessKeyId", AWS_ACCESS_KEY},
+        [{"AWSAccessKeyId", os:getenv('AWS_ACCESS_KEY')},
          {"SignatureMethod", "HmacSHA1"},
          {"SignatureVersion", "2"},
          {"Timestamp", Timestamp}],
@@ -37,11 +37,11 @@ request(Method, Url, Params, ResponseFun) ->
     Path = path(Url),
     QueryParams = query_params(SignParams),
     SignStr = string:join([MethodStr, Host, Path, QueryParams], [$\n]),
-    Signature = sign(AWS_SECRET_KEY, SignStr),
+    Signature = sign(os:getenv('AWS_SECRET_KEY'), SignStr),
     RequestParams = SignParams ++ 
         [{"Signature", Signature}],
     Request = request_param(Method, Url, RequestParams, []),
-    case http:request(Method, Request, [], []) of
+    case httpc:request(Method, Request, [], []) of
         {ok, Response} ->
             ResponseFun(Response);
         {error, Reason} ->
