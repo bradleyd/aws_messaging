@@ -21,7 +21,7 @@
 %%%%  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 %%%%  OTHER DEALINGS IN THE SOFTWARE.
 
--module(aws_sns, [AWS_SNS_URL, AWS_ACCESS_KEY, AWS_SECRET_KEY]).
+-module(aws_sns).
 
 -export([create_topic/1, create_topic_detail/1, create_topic_request/3,
          delete_topic/1, delete_topic_detail/1, delete_topic_request/3,
@@ -37,7 +37,7 @@
          add_permission/4, add_permission_detail/4, add_permission_request/4,
          remove_permission/2, remove_permission_detail/2, remove_permission_request/4]).
 
--define(AWS_QUERY, (aws_query:new(AWS_ACCESS_KEY, AWS_SECRET_KEY))).
+-define(AWS_QUERY, (aws_query:new(os:getenv('AWS_ACCESS_KEY'), os:getenv('AWS_SECRET_KEY')))).
 
 %% Create Topic 
 
@@ -51,7 +51,7 @@ create_topic_request(Name, Params, Response) ->
     RequestParams = Params ++
         [{"Name", Name},
          {"Action", "CreateTopic"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 create_topic_response(_Headers, _RequestId, Doc) ->
     TopicArn = aws_xpath:value("//TopicArn", Doc),
@@ -74,7 +74,7 @@ delete_topic_request(TopicArn, Params, Response) ->
     RequestParams = Params ++
         [{"TopicArn", TopicArn},
          {"Action", "DeleteTopic"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 %% List Topics
 
@@ -87,7 +87,7 @@ list_topics_detail() ->
 list_topics_request(Params, Response) ->
     RequestParams = Params ++
         [{"Action", "ListTopics"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 list_topics_response(_Headers, _RequestId, Doc) ->
     TopicArns = [aws_xpath:value("./TopicArn", Member) ||
@@ -113,7 +113,7 @@ subscribe_request(TopicArn, Protocol, Endpoint, Params, Response) ->
          {"Protocol", Protocol},
          {"Endpoint", Endpoint},
          {"Action", "Subscribe"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 subscribe_response(_Headers, _RequestId, Doc) ->
     SubscriptionArn = aws_xpath:value("//SubscriptionArn", Doc),
@@ -136,7 +136,7 @@ confirm_subscription_request(TopicArn, Token, Params, Response) ->
         [{"TopicArn", TopicArn},
          {"Token", Token},
          {"Action", "ConfirmSubscription"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 %% Unsubscribe
 
@@ -150,7 +150,7 @@ unsubscribe_request(SubscriptionArn, Params, Response) ->
     RequestParams = Params ++
         [{"SubscriptionArn", SubscriptionArn},
          {"Action", "Unsubscribe"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 %% List Subscriptions
 
@@ -163,7 +163,7 @@ list_subscriptions_detail() ->
 list_subscriptions_request(Params, Response) ->
     RequestParams = Params ++
         [{"Action", "ListSubscriptions"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 list_subscriptions_response(_Headers, _RequestId, Doc) ->
     SubscriptionArns = [aws_xpath:value("./SubscriptionArn", Member) ||
@@ -191,7 +191,7 @@ list_subscriptions_by_topic_request(TopicArn, Params, Response) ->
     RequestParams = Params ++
         [{"TopicArn", TopicArn},
          {"Action", "ListSubscriptionsByTopic"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 %% Publish
 
@@ -214,7 +214,7 @@ publish_request(TopicArn, Message, Params, Response) ->
         [{"TopicArn", TopicArn},
          {"Message", Message},
          {"Action", "Publish"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 publish_response_detail(_Headers, RequestId, Doc) ->
     MessageId = aws_xpath:value("//MessageId", Doc),
@@ -232,7 +232,7 @@ get_topic_attributes_request(TopicArn, Params, Response) ->
     RequestParams = Params ++
         [{"TopicArn", TopicArn},
          {"Action", "GetTopicAttributes"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 get_topic_attributes_response(_Headers, _RequestId, Doc) ->
     Attributes = [{aws_xpath:value("./key", Entry),
@@ -260,7 +260,7 @@ set_topic_attributes_request(TopicArn, Name, Value, Params, Response) ->
          {"AttributeName", Name},
          {"AttributeValue", Value},
          {"Action", "SetTopicAttributes"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 %% Add Permission
 
@@ -279,7 +279,7 @@ add_permission_request(TopicArn, Label, Params, Response) ->
         [{"TopicArn", TopicArn},
          {"Label", Label},
          {"Action", "AddPermission"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 %% Remove Permission
 
@@ -294,7 +294,7 @@ remove_permission_request(TopicArn, Label, Params, Response) ->
         [{"TopicArn", TopicArn},
          {"Label", Label},
          {"Action", "RemovePermission"}],
-    request(post, AWS_SNS_URL, RequestParams, Response).
+    request(post, os:getenv('AWS_SNS_URL'), RequestParams, Response).
 
 %% Misc
 
